@@ -40,6 +40,7 @@ app.post("/checkout", async (req, res) => {
             metadata: {
                 userid: "74368436439482",
             },
+            requested_info: ['name', 'email']
         })
 
         res.status(200).json({
