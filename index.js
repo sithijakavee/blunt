@@ -55,19 +55,19 @@ app.post("/checkout", async (req, res) => {
 
 
         const data = {
-            orderid: orderid,
-            userid: userid,
-            itemid: itemid,
-            total: amount,
-            fullname: fullName,
-            email: email,
-            phoneno: phone,
-            address1: address1,
-            address2: address2,
-            city: city,
-            country: country,
-            postalcode: postalCode,
-            info: info,
+            orderid: orderid.toString(),
+            userid: userid.toString(),
+            itemid: itemid.toString(),
+            total: parseFloat(amount),
+            fullname: fullName.toString(),
+            email: email.toString(),
+            phoneno: phone.toString(),
+            address1: address1.toString(),
+            address2: address2.toString(),
+            city: city.toString(),
+            country: country.toString(),
+            postalcode: postalCode.toString(),
+            info: info.toString(),
             status: "pending",
         }
 
