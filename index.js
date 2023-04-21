@@ -1,4 +1,5 @@
 require('dotenv').config()
+import axios from 'axios';
 const express = require('express')
 const app = express()
 const cors = require('cors');
@@ -6,7 +7,7 @@ const cors = require('cors');
 app.use(express.json({
     verify: (req, res, buf) => {
         const url = req.originalUrl
-        if (url.startsWith("/webhooks")){
+        if (url.startsWith("/webhooks")) {
             req.rawBody = buf.toString()
         }
     }
@@ -22,13 +23,13 @@ var Webhook = coinbase.Webhook
 Client.init("bd7252b1-742e-4ebd-aee6-a1aacdc74ae5");
 
 app.get("/", async (req, res) => {
-   res.send("Api")
+    res.send("Crypto Api")
 })
 
 app.post("/checkout", async (req, res) => {
-    const {name, description, amount} = req.body;
+    const { orderid, name, description, amount, itemid, userid, fullName, email, phone, address1, address2, country, city, postalCode, info } = req.body;
 
-    try{
+    try {
         const charge = await resources.Charge.create({
             name: name,
             description: description,
@@ -38,17 +39,47 @@ app.post("/checkout", async (req, res) => {
             },
             pricing_type: "fixed_price",
             metadata: {
-                userid: "74368436439482",
+                orderid: orderid,
+                itemid: itemid,
+                userid: userid,
+                fullName: fullName,
+                email: email,
+                phone: phone,
+                address1: address1,
+                address2: address2,
+                country: country,
+                city: city,
+                postalCode: postalCode,
+                info: info
             },
-            requested_info: ['name', 'email']
         })
 
+        axios.post('https://bluntphramaapi.herokuapp.com/postOrder', {
+            orderid: orderid,
+            userid: userid,
+            itemid: itemid,
+            total: amount,
+            fullname: fullName,
+            email: email,
+            phoneno: phone,
+            address1: address1,
+            address2: address2,
+            city: city,
+            country: country,
+            postalcode: postalCode,
+            info: info,
+            status: "pending",
+        }).then(res => {
+            return res
+        })
+
+        
         res.status(200).json({
             charge: charge,
             url: charge.hosted_url
         })
     }
-    catch (error){
+    catch (error) {
         res.status(500).json({
             error: error
         })
@@ -62,7 +93,7 @@ app.post("/webhooks", async (req, res) => {
         '6056c8e2-61cf-4426-b76d-3e8beda7a9ef'
     )
 
-    if(event.type === "charge:confirmed"){
+    if (event.type === "charge:confirmed") {
         let amount = event.data.pricing.local.amount;
         let currency = event.data.pricing.local.currency;
         let userid = event.data.metadata.userid;
@@ -70,20 +101,20 @@ app.post("/webhooks", async (req, res) => {
         console.log(amount, currency, userid)
     }
 
-    if(event.type === "charge:created"){
+    if (event.type === "charge:created") {
         console.log("created")
     }
-    if(event.type === "charge:delayed"){
+    if (event.type === "charge:delayed") {
         console.log("delayed")
     }
-    if(event.type === "charge:failed"){
+    if (event.type === "charge:failed") {
         console.log("failed")
     }
-    if(event.type === "charge:pending"){
+    if (event.type === "charge:pending") {
         console.log("Pending")
     }
-    
-    if(event.type === "charge:resolved"){
+
+    if (event.type === "charge:resolved") {
         console.log("Resolved")
     }
 
