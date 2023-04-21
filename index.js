@@ -1,5 +1,4 @@
 require('dotenv').config()
-require('axios')
 const express = require('express')
 const app = express()
 const cors = require('cors');
@@ -54,7 +53,11 @@ app.post("/checkout", async (req, res) => {
             },
         })
 
-        axios.post('https://bluntphramaapi.herokuapp.com/postOrder', {
+        axios.post('https://bluntphramaapi.herokuapp.com/postOrder', ).then(res => {
+            return res
+        })
+
+        const data = {
             orderid: orderid,
             userid: userid,
             itemid: itemid,
@@ -69,11 +72,24 @@ app.post("/checkout", async (req, res) => {
             postalcode: postalCode,
             info: info,
             status: "pending",
-        }).then(res => {
-            return res
-        })
+        }
 
-        
+        try {
+            const response = await fetch("https://bluntphramaapi.herokuapp.com/postOrder", {
+                method: "POST", // or 'PUT'
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+
+            const result = await response.json();
+            console.log("Success:", result);
+        } catch (error) {
+            console.error("Error:", error);
+        }
+
+
         res.status(200).json({
             charge: charge,
             url: charge.hosted_url
