@@ -53,9 +53,6 @@ app.post("/checkout", async (req, res) => {
             },
         })
 
-        axios.post('https://bluntphramaapi.herokuapp.com/postOrder', ).then(res => {
-            return res
-        })
 
         const data = {
             orderid: orderid,
